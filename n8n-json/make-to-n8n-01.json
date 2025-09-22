@@ -1,0 +1,2286 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "edglrd-content-creator-b-v2",
+          "options": {
+            "rawBody": true
+          }
+        },
+        "name": "Webhook Trigger",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1,
+        "id": "webhookTrigger",
+        "credentials": {},
+        "webhookId": "edglrd-content-creator-b-v2"
+      },
+      {
+        "parameters": {
+          "conditions": [
+            {
+              "value1": "={{ $json.aid }}",
+              "value2": "=18",
+              "type": "string"
+            }
+          ]
+        },
+        "name": "Route by AID (18: Story Gen)",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "id": "routeByAid18",
+        "alwaysOutputData": true,
+        "continueOnFail": true,
+        ".-x": 250,
+        ".-y": 300,
+        "active": true
+      },
+      {
+        "parameters": {
+          "conditions": [
+            {
+              "value1": "={{ $json.aid }}",
+              "value2": "=16",
+              "type": "string"
+            }
+          ]
+        },
+        "name": "Route by AID (16: Scenes/Shots Gen)",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "id": "routeByAid16",
+        "alwaysOutputData": true,
+        "continueOnFail": true,
+        ".-x": 250,
+        ".-y": 600,
+        "active": true
+      },
+      {
+        "parameters": {
+          "conditions": [
+            {
+              "value1": "={{ $json.aid }}",
+              "value2": "=17",
+              "type": "string"
+            }
+          ]
+        },
+        "name": "Route by AID (17: DALL-E Image)",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "id": "routeByAid17",
+        "alwaysOutputData": true,
+        "continueOnFail": true,
+        ".-x": 250,
+        ".-y": 900,
+        "active": true
+      },
+      {
+        "parameters": {
+          "conditions": [
+            {
+              "value1": "={{ $json.aid }}",
+              "value2": "=6",
+              "type": "string"
+            }
+          ]
+        },
+        "name": "Route by AID (6: MJ Image Gen)",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "id": "routeByAid6",
+        "alwaysOutputData": true,
+        "continueOnFail": true,
+        ".-x": 250,
+        ".-y": 1200,
+        "active": true
+      },
+      {
+        "parameters": {
+          "conditions": [
+            {
+              "value1": "={{ $json.aid }}",
+              "value2": "=2",
+              "type": "string"
+            }
+          ]
+        },
+        "name": "Route by AID (2: MJ Upscale)",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "id": "routeByAid2",
+        "alwaysOutputData": true,
+        "continueOnFail": true,
+        ".-x": 250,
+        ".-y": 1500,
+        "active": true
+      },
+      {
+        "parameters": {
+          "conditions": [
+            {
+              "value1": "={{ $json.aid }}",
+              "value2": "=7",
+              "type": "string"
+            }
+          ]
+        },
+        "name": "Route by AID (7: Flux Image Gen)",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "id": "routeByAid7",
+        "alwaysOutputData": true,
+        "continueOnFail": true,
+        ".-x": 250,
+        ".-y": 1800,
+        "active": true
+      },
+      {
+        "parameters": {
+          "conditions": [
+            {
+              "value1": "={{ $json.aid }}",
+              "value2": "=3",
+              "type": "string"
+            }
+          ]
+        },
+        "name": "Route by AID (3: LumaLabs Video Gen)",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "id": "routeByAid3",
+        "alwaysOutputData": true,
+        "continueOnFail": true,
+        ".-x": 250,
+        ".-y": 2100,
+        "active": true
+      },
+      {
+        "parameters": {
+          "conditions": [
+            {
+              "value1": "={{ $json.aid }}",
+              "value2": "=4",
+              "type": "string"
+            }
+          ]
+        },
+        "name": "Route by AID (4: ElevenLabs Voiceover)",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "id": "routeByAid4",
+        "alwaysOutputData": true,
+        "continueOnFail": true,
+        ".-x": 250,
+        ".-y": 2400,
+        "active": true
+      },
+      {
+        "parameters": {
+          "conditions": [
+            {
+              "value1": "={{ $json.aid }}",
+              "value2": "=14",
+              "type": "string"
+            }
+          ]
+        },
+        "name": "Route by AID (14: Kling Video Gen)",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "id": "routeByAid14",
+        "alwaysOutputData": true,
+        "continueOnFail": true,
+        ".-x": 250,
+        ".-y": 2700,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblnjMCq6sCjWVWaP",
+          "recordId": "={{ $json.recordId }}",
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Get Story Record (AID 18)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableGetStoryRecordAid18",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 450,
+        ".-y": 300,
+        "active": true
+      },
+      {
+        "parameters": {
+          "model": "gpt-4o-mini",
+          "messages": [
+            {
+              "role": "system",
+              "content": "={{ $node[\"Airtable Get Story Record (AID 18)\"].json[\"Story Prompt (System Prompt)\"][0] }}"
+            },
+            {
+              "role": "user",
+              "content": "={{ $node[\"Airtable Get Story Record (AID 18)\"].json.Source + '\\n\\n' + $node[\"Airtable Get Story Record (AID 18)\"].json[\"Story Prompt (User Prompt)\"][0] }}"
+            }
+          ],
+          "options": {
+            "temperature": 1,
+            "topP": 1,
+            "n": 1,
+            "responseFormat": "text"
+          }
+        },
+        "name": "OpenAI Create Story Completion",
+        "type": "n8n-nodes-base.openAi",
+        "typeVersion": 1,
+        "id": "openAiCreateStoryCompletion",
+        "credentials": {
+          "openAiApi": {
+            "id": "openai-robedglrd",
+            "name": "Rob Edglrd OpenAI"
+          }
+        },
+        ".-x": 650,
+        ".-y": 300,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblnjMCq6sCjWVWaP",
+          "recordId": "={{ $node[\"Airtable Get Story Record (AID 18)\"].json.id }}",
+          "updateFields": {
+            "fields": [
+              {
+                "fieldName": "fldZpZrC7V4CpkD6i",
+                "fieldValue": "={{ $node[\"OpenAI Create Story Completion\"].json.choices[0].message.content }}"
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Update Story Record",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableUpdateStoryRecord",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 850,
+        ".-y": 300,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblnjMCq6sCjWVWaP",
+          "recordId": "={{ $json.recordId }}",
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Get Story Record (AID 16)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableGetStoryRecordAid16",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 450,
+        ".-y": 600,
+        "active": true
+      },
+      {
+        "parameters": {
+          "model": "gpt-4o-mini",
+          "messages": [
+            {
+              "role": "system",
+              "content": "={{ $node[\"Airtable Get Story Record (AID 16)\"].json[\"Shot Generation (System Prompt)\"][0] }}"
+            },
+            {
+              "role": "user",
+              "content": "={{ JSON.stringify($node[\"Airtable Get Story Record (AID 16)\"].json.Story) + '\\n\\n' + $node[\"Airtable Get Story Record (AID 16)\"].json[\"Scene Generation (User Prompt)\"][0] }}"
+            }
+          ],
+          "options": {
+            "temperature": 1,
+            "topP": 1,
+            "n": 1,
+            "responseFormat": "json_object",
+            "jsonResponse": true
+          }
+        },
+        "name": "OpenAI Generate Scenes",
+        "type": "n8n-nodes-base.openAi",
+        "typeVersion": 1,
+        "id": "openAiGenerateScenes",
+        "credentials": {
+          "openAiApi": {
+            "id": "openai-robedglrd",
+            "name": "Rob Edglrd OpenAI"
+          }
+        },
+        ".-x": 650,
+        ".-y": 600,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblE5VV3HYdNSVkjv",
+          "records": {
+            "data": [
+              {
+                "fields": {
+                  "fldNo3TGapnJVzAFZ": "={{ $json.scene.name }}",
+                  "fldO92IrT2chKU1Cv": "={{ [ $node[\"Airtable Get Story Record (AID 16)\"].json.id ] }}",
+                  "fldU0M57eYkjaIwsW": "={{ ($json.item_index + 1) * 10 }}",
+                  "fldjWU7ZiPkGJ02MQ": "={{ $json.scene.script }}"
+                }
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Create Scene Record",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableCreateSceneRecord",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 850,
+        ".-y": 600,
+        "active": true
+      },
+      {
+        "parameters": {
+          "model": "gpt-4o-mini",
+          "messages": [
+            {
+              "role": "system",
+              "content": "={{ $node[\"Airtable Get Story Record (AID 16)\"].json[\"Shot Generation (System Prompt)\"][0] }}"
+            },
+            {
+              "role": "user",
+              "content": "={{ JSON.stringify($node[\"Airtable Create Scene Record\"].json[\"Scene Script\"]) + '\\n\\n' + $node[\"Airtable Get Story Record (AID 16)\"].json[\"Shot Generation (User Prompt)\"][0] + '\\n\\nJust for context, here\\'s the entire story below. Remember the story below is just for reference.\\n\\n' + JSON.stringify($node[\"Airtable Get Story Record (AID 16)\"].json.Story) }}"
+            }
+          ],
+          "options": {
+            "temperature": 1,
+            "topP": 1,
+            "n": 1,
+            "responseFormat": "json_object",
+            "jsonResponse": true
+          }
+        },
+        "name": "OpenAI Generate Shots from Scene",
+        "type": "n8n-nodes-base.openAi",
+        "typeVersion": 1,
+        "id": "openAiGenerateShotsFromScene",
+        "credentials": {
+          "openAiApi": {
+            "id": "openai-robedglrd",
+            "name": "Rob Edglrd OpenAI"
+          }
+        },
+        ".-x": 1050,
+        ".-y": 600,
+        "active": true
+      },
+      {
+        "parameters": {
+          "model": "gpt-4o-mini",
+          "messages": [
+            {
+              "role": "system",
+              "content": "={{ $node[\"Airtable Get Story Record (AID 16)\"].json[\"Shot Generation (System Prompt)\"][0] }}"
+            },
+            {
+              "role": "user",
+              "content": "={{ JSON.stringify($json.shot.script) + '\\n\\n' + $node[\"Airtable Get Story Record (AID 16)\"].json[\"Image Prompt Generation (User Prompt)\"][0] + '\\n\\nJust for context, here\\'s the entire scene below. Use it to help you construct the best AI image prompt so you have more context, and what comes before and after this particular shot.\\n\\nRemember this is just for reference.\\n\\n' + JSON.stringify($node[\"Airtable Create Scene Record\"].json[\"Scene Script\"]) + '\\n\\nAlso, just for context, here\\'s the entire story below. Remember this is just for reference.\\n\\n' + JSON.stringify($node[\"Airtable Get Story Record (AID 16)\"].json.Story) }}"
+            }
+          ],
+          "options": {
+            "temperature": 1,
+            "topP": 1,
+            "n": 1,
+            "responseFormat": "text"
+          }
+        },
+        "name": "OpenAI Generate Image Prompt",
+        "type": "n8n-nodes-base.openAi",
+        "typeVersion": 1,
+        "id": "openAiGenerateImagePrompt",
+        "credentials": {
+          "openAiApi": {
+            "id": "openai-robedglrd",
+            "name": "Rob Edglrd OpenAI"
+          }
+        },
+        ".-x": 1250,
+        ".-y": 500,
+        "active": true
+      },
+      {
+        "parameters": {
+          "model": "gpt-4o-mini",
+          "messages": [
+            {
+              "role": "system",
+              "content": "={{ $node[\"Airtable Get Story Record (AID 16)\"].json[\"Story Prompt (System Prompt)\"][0] }}"
+            },
+            {
+              "role": "user",
+              "content": "={{ JSON.stringify($node[\"OpenAI Generate Image Prompt\"].json.choices[0].message.content) + '\\n\\n' + $node[\"Airtable Get Story Record (AID 16)\"].json[\"Video Prompt Generation (User Prompt)\"][0] }}"
+            }
+          ],
+          "options": {
+            "temperature": 1,
+            "topP": 1,
+            "n": 1,
+            "responseFormat": "text"
+          }
+        },
+        "name": "OpenAI Generate Video Prompt",
+        "type": "n8n-nodes-base.openAi",
+        "typeVersion": 1,
+        "id": "openAiGenerateVideoPrompt",
+        "credentials": {
+          "openAiApi": {
+            "id": "openai-robedglrd",
+            "name": "Rob Edglrd OpenAI"
+          }
+        },
+        ".-x": 1250,
+        ".-y": 700,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblEX1h61Zxas1oaY",
+          "records": {
+            "data": [
+              {
+                "fields": {
+                  "fldNg9fJuqH6vFEws": "={{ $json.shot.name }}",
+                  "fld0n1Anxs7i7KVeI": "={{ ($json.item_index + 1) * 10 }}",
+                  "fldlbAwlpF84umsss": "={{ $json.shot.script }}",
+                  "fld0d2lWvsdWE82Sv": "={{ $node[\"OpenAI Generate Image Prompt\"].json.choices[0].message.content }}",
+                  "fldnYBcgpYVKvqo3Q": "={{ $node[\"OpenAI Generate Video Prompt\"].json.choices[0].message.content }}",
+                  "fldtacJVnRCNoaoUj": "={{ [ $node[\"Airtable Create Scene Record\"].json.id ] }}"
+                }
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Create Shot Record",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableCreateShotRecord",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 1450,
+        ".-y": 600,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblEX1h61Zxas1oaY",
+          "recordId": "={{ $json.recordId }}",
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Get Shot Record (AID 17)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableGetShotRecordAid17",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 450,
+        ".-y": 900,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "generateImage",
+          "prompt": "={{ $node[\"Airtable Get Shot Record (AID 17)\"].json[\"Final Image Prompt\"] }}",
+          "options": {
+            "model": "dall-e-3",
+            "quality": "hd",
+            "style": "vivid",
+            "size": "={{ (($node[\"Airtable Get Shot Record (AID 17)\"].json[\"Aspect Ratio\"][0] === \"1:1\") ? \"1024x1024\" : (($node[\"Airtable Get Shot Record (AID 17)\"].json[\"Width (Aspect Ratio)\"][0] < $node[\"Airtable Get Shot Record (AID 17)\"].json[\"Height (Aspect Ratio)\"][0]) ? \"1792x1024\" : \"1024x1792\")) }}"
+          }
+        },
+        "name": "OpenAI Generate DALL-E Image",
+        "type": "n8n-nodes-base.openAi",
+        "typeVersion": 1,
+        "id": "openAiGenerateDalleImage",
+        "credentials": {
+          "openAiApi": {
+            "id": "openai-robedglrd",
+            "name": "Rob Edglrd OpenAI"
+          }
+        },
+        ".-x": 650,
+        ".-y": 900,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblwnaoDiahBVJEzd",
+          "records": {
+            "data": [
+              {
+                "fields": {
+                  "fldRye1FTbNbDCigl": "={{ [ { url: $node[\"OpenAI Generate DALL-E Image\"].json.data[0].url } ] }}",
+                  "fldOyeY6aneJPtXIC": "Image",
+                  "fldEOKVRZoE428KYu": "={{ [ $node[\"Airtable Get Shot Record (AID 17)\"].json.id ] }}"
+                }
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Create File Record (DALL-E)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableCreateFileRecordDalle",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 850,
+        ".-y": 900,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblEX1h61Zxas1oaY",
+          "recordId": "={{ $node[\"Airtable Get Shot Record (AID 17)\"].json.id }}",
+          "updateFields": {
+            "fields": [
+              {
+                "fieldName": "fldQsJ61BYIAd8dSo",
+                "fieldValue": "={{ [ $node[\"Airtable Create File Record (DALL-E)\"].json.id ] }}"
+              },
+              {
+                "fieldName": "fldTOTVJopqv147lz",
+                "fieldValue": "={{ [] }}"
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Update Shot Record (DALL-E)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableUpdateShotRecordDalle",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 1050,
+        ".-y": 900,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblEX1h61Zxas1oaY",
+          "recordId": "={{ $json.recordId }}",
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Get Shot Record (AID 6)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableGetShotRecordAid6",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 450,
+        ".-y": 1200,
+        "active": true
+      },
+      {
+        "parameters": {
+          "url": "https://api.goapi.ai/api/v1/task",
+          "method": "POST",
+          "authentication": "headerAuth",
+          "headerAuth": {
+            "name": "X-API-KEY",
+            "value": "={{ $secret.GOAPI_API_KEY }}"
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "content": "={ \"model\":\"midjourney\", \"task_type\":\"imagine\", \"input\":{ \"prompt\":\"" + $node[\"Airtable Get Shot Record (AID 6)\"].json[\"Final Image Prompt\"] + "\", \"aspect_ratio\":\"" + $node[\"Airtable Get Shot Record (AID 6)\"].json[\"Aspect Ratio\"][0] + "\", \"process_mode\":\"relax\", \"skip_prompt_check\":false, \"bot_id\":0 }, \"config\":{ \"service_mode\":\"\", \"webhook_conefig\":{ \"endpoint\":\"" + $workflow.params.MJ_CREATE_IMAGES_WEBHOOK + "\", \"secret\":\"\" } } }",
+            "contentType": "json"
+          },
+          "responseFormat": "json",
+          "options": {
+            "fullResponse": true,
+            "alwaysContinueOnFail": true
+          }
+        },
+        "name": "HTTP Request Midjourney Image (GoAPI)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 3,
+        "id": "httpRequestMidjourneyImageGoapi",
+        ".-x": 650,
+        ".-y": 1200,
+        "active": true
+      },
+      {
+        "parameters": {
+          "conditions": [
+            {
+              "value1": "={{ $node[\"HTTP Request Midjourney Image (GoAPI)\"].json.statusCode }}",
+              "value2": "=200",
+              "type": "number"
+            }
+          ]
+        },
+        "name": "IF Midjourney Success",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "id": "ifMidjourneySuccess",
+        "alwaysOutputData": true,
+        "continueOnFail": true,
+        ".-x": 850,
+        ".-y": 1200,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblwnaoDiahBVJEzd",
+          "records": {
+            "data": [
+              {
+                "fields": {
+                  "fld6vms9wVp9YAU2n": "={{ $node[\"HTTP Request Midjourney Image (GoAPI)\"].json.data.data.task_id }}",
+                  "fldOyeY6aneJPtXIC": "Image",
+                  "fldEOKVRZoE428KYu": "={{ [ $node[\"Airtable Get Shot Record (AID 6)\"].json.id ] }}"
+                }
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Create File Record (MJ Success)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableCreateFileRecordMjSuccess",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 1050,
+        ".-y": 1100,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tbl4i2bLKhLsLEm7t",
+          "records": {
+            "data": [
+              {
+                "fields": {
+                  "fldObHsEKPhuonIZL": "={{ [ $node[\"Airtable Get Shot Record (AID 6)\"].json.id ] }}",
+                  "fldY4ShdMSKDGQufU": "={{ $node[\"HTTP Request Midjourney Image (GoAPI)\"].json.data.data.error.message }}",
+                  "flddAAJl8U4Iumf5t": "https://api.goapi.ai/api/v1/task",
+                  "fldgoMPaGbHzKEsPR": "={{ $node[\"HTTP Request Midjourney Image (GoAPI)\"].json.data.data.error.code }}",
+                  "fldpPufGETxtZoLNv": "AI Image Gen"
+                }
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Create Log Record (MJ Failure)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableCreateLogRecordMjFailure",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 1050,
+        ".-y": 1300,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblEX1h61Zxas1oaY",
+          "recordId": "={{ $json.recordId }}",
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Get Shot Record (AID 2)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableGetShotRecordAid2",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 450,
+        ".-y": 1500,
+        "active": true
+      },
+      {
+        "parameters": {
+          "url": "https://api.midjourneyapi.xyz/mj/v2/upscale",
+          "method": "POST",
+          "authentication": "headerAuth",
+          "headerAuth": {
+            "name": "X-API-KEY",
+            "value": "={{ $secret.GOAPI_API_KEY }}"
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "content": "={ \"origin_task_id\": \"" + $node[\"Airtable Get Shot Record (AID 2)\"].json[\"Image API Task ID\"][0] + "\", \"index\":\"" + $node[\"Airtable Get Shot Record (AID 2)\"].json[\"Image Selector\"] + "\", \"webhook_endpoint\":\"" + $workflow.params.MJ_UPSCALE_IMAGE_WEBHOOK + "\" }",
+            "contentType": "json"
+          },
+          "responseFormat": "json",
+          "options": {
+            "fullResponse": true,
+            "alwaysContinueOnFail": true
+          }
+        },
+        "name": "HTTP Request Upscale Image (GoAPI)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 3,
+        "id": "httpRequestUpscaleImageGoapi",
+        ".-x": 650,
+        ".-y": 1500,
+        "active": true
+      },
+      {
+        "parameters": {
+          "conditions": [
+            {
+              "value1": "={{ $node[\"HTTP Request Upscale Image (GoAPI)\"].json.statusCode }}",
+              "value2": "=200",
+              "type": "number"
+            }
+          ]
+        },
+        "name": "IF Upscale Success",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "id": "ifUpscaleSuccess",
+        "alwaysOutputData": true,
+        "continueOnFail": true,
+        ".-x": 850,
+        ".-y": 1500,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblwnaoDiahBVJEzd",
+          "records": {
+            "data": [
+              {
+                "fields": {
+                  "fld6vms9wVp9YAU2n": "={{ $node[\"HTTP Request Upscale Image (GoAPI)\"].json.task_id }}",
+                  "fldOyeY6aneJPtXIC": "Image",
+                  "fldEOKVRZoE428KYu": "={{ [ $node[\"Airtable Get Shot Record (AID 2)\"].json.id ] }}"
+                }
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Create File Record (Upscale Success)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableCreateFileRecordUpscaleSuccess",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 1050,
+        ".-y": 1400,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tbl4i2bLKhLsLEm7t",
+          "records": {
+            "data": [
+              {
+                "fields": {
+                  "fldObHsEKPhuonIZL": "={{ [ $node[\"Airtable Get Shot Record (AID 2)\"].json.id ] }}",
+                  "fldY4ShdMSKDGQufU": "={{ $node[\"HTTP Request Upscale Image (GoAPI)\"].json.message }}",
+                  "flddAAJl8U4Iumf5t": "/api.midjourneyapi.xyz/mj/v2/imagine",
+                  "fldgoMPaGbHzKEsPR": "={{ $node[\"HTTP Request Upscale Image (GoAPI)\"].json.statusCode }}",
+                  "fldpPufGETxtZoLNv": "AI Image Gen"
+                }
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Create Log Record (Upscale Failure)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableCreateLogRecordUpscaleFailure",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 1050,
+        ".-y": 1600,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblEX1h61Zxas1oaY",
+          "recordId": "={{ $json.recordId }}",
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Get Shot Record (AID 7)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableGetShotRecordAid7",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 450,
+        ".-y": 1800,
+        "active": true
+      },
+      {
+        "parameters": {
+          "url": "https://api.goapi.ai/api/v1/task",
+          "method": "POST",
+          "authentication": "headerAuth",
+          "headerAuth": {
+            "name": "X-API-KEY",
+            "value": "={{ $secret.GOAPI_AI_API_KEY }}"
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "content": "={ \"model\": \"Qubico/flux1-dev-advanced\", \"task_type\": \"txt2img-lora\", \"input\": { \"prompt\": \"" + $node[\"Airtable Get Shot Record (AID 7)\"].json[\"Final Image Prompt\"] + "\", \"lora_settings\": [ { \"lora_type\": \"anime\" } ] }, \"config\": { \"webhook_config\": { \"endpoint\": \"\", \"secret\": \"" + $workflow.params.FLUX_CREATE_IMAGE_WEBHOOK + "\" } } }",
+            "contentType": "json"
+          },
+          "responseFormat": "json",
+          "options": {
+            "fullResponse": true,
+            "alwaysContinueOnFail": true
+          }
+        },
+        "name": "HTTP Request Flux Image (GoAPI)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 3,
+        "id": "httpRequestFluxImageGoapi",
+        ".-x": 650,
+        ".-y": 1800,
+        "active": true
+      },
+      {
+        "parameters": {
+          "conditions": [
+            {
+              "value1": "={{ $node[\"HTTP Request Flux Image (GoAPI)\"].json.data.message }}",
+              "value2": "=success",
+              "type": "string"
+            }
+          ]
+        },
+        "name": "IF Flux Success",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "id": "ifFluxSuccess",
+        "alwaysOutputData": true,
+        "continueOnFail": true,
+        ".-x": 850,
+        ".-y": 1800,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblwnaoDiahBVJEzd",
+          "records": {
+            "data": [
+              {
+                "fields": {
+                  "fld6vms9wVp9YAU2n": "={{ $node[\"HTTP Request Flux Image (GoAPI)\"].json.data.data.task_id }}",
+                  "fldOyeY6aneJPtXIC": "Image",
+                  "fldEOKVRZoE428KYu": "={{ [ $node[\"Airtable Get Shot Record (AID 7)\"].json.id ] }}",
+                  "fldRye1FTbNbDCigl": "={{ [] }}"
+                }
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Create File Record (Flux Success)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableCreateFileRecordFluxSuccess",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 1050,
+        ".-y": 1800,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblEX1h61Zxas1oaY",
+          "recordId": "={{ $json.recordId }}",
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Get Shot Record (AID 3)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableGetShotRecordAid3",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 450,
+        ".-y": 2100,
+        "active": true
+      },
+      {
+        "parameters": {
+          "url": "https://api.goapi.ai/api/luma/v1/video",
+          "method": "POST",
+          "authentication": "headerAuth",
+          "headerAuth": {
+            "name": "X-API-KEY",
+            "value": "={{ $secret.GOAPI_API_KEY }}"
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "content": "={ \"expand_prompt\": false, \"prompt\": \"" + $node[\"Airtable Get Shot Record (AID 3)\"].json.prompt + "\", \"image_url\": \"" + $node[\"Airtable Get Shot Record (AID 3)\"].json.Image[0].url + "\" }",
+            "contentType": "json"
+          },
+          "responseFormat": "json",
+          "options": {
+            "fullResponse": true,
+            "alwaysContinueOnFail": true
+          }
+        },
+        "name": "HTTP Request Start LumaLabs Creation (GoAPI)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 3,
+        "id": "httpRequestStartLumalabsCreationGoapi",
+        ".-x": 650,
+        ".-y": 2100,
+        "active": true
+      },
+      {
+        "parameters": {
+          "values": [
+            {
+              "name": "status",
+              "value": "pending"
+            },
+            {
+              "name": "loopCount",
+              "value": 0
+            }
+          ]
+        },
+        "name": "Set LumaLabs Loop Variables",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "id": "setLumalabsLoopVariables",
+        ".-x": 850,
+        ".-y": 2100,
+        "active": true
+      },
+      {
+        "parameters": {
+          "mode": "loopUntilCondition",
+          "iterations": 6,
+          "continueOnFail": true,
+          "conditions": [
+            {
+              "value1": "={{ $node[\"Set LumaLabs Loop Variables\"].json.status }}",
+              "value2": "=completed",
+              "type": "string"
+            }
+          ]
+        },
+        "name": "Do While LumaLabs Polling",
+        "type": "n8n-nodes-base.doWhile",
+        "typeVersion": 1,
+        "id": "doWhileLumalabsPolling",
+        ".-x": 1050,
+        ".-y": 2100,
+        "active": true
+      },
+      {
+        "parameters": {
+          "time": "120",
+          "unit": "seconds"
+        },
+        "name": "Wait for LumaLabs Polling",
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1,
+        "id": "waitForLumalabsPolling",
+        ".-x": 1250,
+        ".-y": 2000,
+        "active": true
+      },
+      {
+        "parameters": {
+          "url": "https://api.goapi.ai/api/luma/v1/video/={{ $node[\"HTTP Request Start LumaLabs Creation\"].json.data.data.task_id }}",
+          "method": "GET",
+          "authentication": "headerAuth",
+          "headerAuth": {
+            "name": "X-API-KEY",
+            "value": "={{ $secret.GOAPI_API_KEY }}"
+          },
+          "responseFormat": "json",
+          "options": {
+            "fullResponse": true,
+            "alwaysContinueOnFail": true
+          }
+        },
+        "name": "HTTP Request Get LumaLabs Video Status",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 3,
+        "id": "httpRequestGetLumalabsVideoStatus",
+        ".-x": 1450,
+        ".-y": 2000,
+        "active": true
+      },
+      {
+        "parameters": {
+          "values": [
+            {
+              "name": "loopCount",
+              "value": "={{ $node[\"Set LumaLabs Loop Variables\"].json.loopCount + 1 }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $node[\"HTTP Request Get LumaLabs Video Status\"].json.data.data.status }}"
+            }
+          ]
+        },
+        "name": "Update LumaLabs Loop Variables",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "id": "updateLumalabsLoopVariables",
+        ".-x": 1650,
+        ".-y": 2000,
+        "active": true
+      },
+      {
+        "parameters": {
+          "conditions": [
+            {
+              "value1": "={{ $node[\"Update LumaLabs Loop Variables\"].json.status }}",
+              "value2": "=completed",
+              "type": "string"
+            }
+          ]
+        },
+        "name": "IF LumaLabs Completed",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "id": "ifLumalabsCompleted",
+        "alwaysOutputData": true,
+        "continueOnFail": true,
+        ".-x": 1850,
+        ".-y": 2100,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblwnaoDiahBVJEzd",
+          "records": {
+            "data": [
+              {
+                "fields": {
+                  "fldRye1FTbNbDCigl": "={{ [ { url: $node[\"HTTP Request Get LumaLabs Video Status\"].json.data.data.generation.video.url } ] }}",
+                  "fldOyeY6aneJPtXIC": "Video",
+                  "fldEljz4DHAw8kNEU": "={{ [ $node[\"Airtable Get Shot Record (AID 3)\"].json.id ] }}"
+                }
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Create File Record (LumaLabs Video)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableCreateFileRecordLumalabsVideo",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 2050,
+        ".-y": 2000,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblEX1h61Zxas1oaY",
+          "recordId": "={{ $node[\"Airtable Get Shot Record (AID 3)\"].json.id }}",
+          "updateFields": {
+            "fields": [
+              {
+                "fieldName": "fldeZSFBTDY4QqROU",
+                "fieldValue": "={{ [ $node[\"Airtable Create File Record (LumaLabs Video)\"].json.id ] }}"
+              },
+              {
+                "fieldName": "fldinUO0h7ngEmN5T",
+                "fieldValue": "={{ [] }}"
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Update Shot Record (LumaLabs Video)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableUpdateShotRecordLumalabsVideo",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 2250,
+        ".-y": 2000,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblEX1h61Zxas1oaY",
+          "recordId": "={{ $json.recordId }}",
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Get Shot Record (AID 4)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableGetShotRecordAid4",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 450,
+        ".-y": 2400,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "createTextToSpeech",
+          "text": "={{ $node[\"Airtable Get Shot Record (AID 4)\"].json[\"Shot Script\"] }}",
+          "options": {
+            "modelId": "eleven_multilingual_v2",
+            "voiceId": "XB0fDUnXU5powFXDhCwa",
+            "outputFormat": "buffer"
+          }
+        },
+        "name": "ElevenLabs Create Text to Speech",
+        "type": "n8n-nodes-base.elevenLabs",
+        "typeVersion": 1,
+        "id": "elevenLabsCreateTextToSpeech",
+        "credentials": {
+          "elevenLabsApi": {
+            "id": "elevenlabs-unyhimalayanwolf",
+            "name": "Unyielding Himalayan Wolf"
+          }
+        },
+        ".-x": 650,
+        ".-y": 2400,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "upload",
+          "bucket": "={{ $workflow.params.GCP_BUCKET }}",
+          "fileName": "={{ $node[\"ElevenLabs Create Text to Speech\"].binary.data.fileName }}",
+          "data": "={{ $node[\"ElevenLabs Create Text to Speech\"].binary.data }}",
+          "contentType": "audio/mpeg"
+        },
+        "name": "Google Cloud Storage Upload Audio",
+        "type": "n8n-nodes-base.googleCloudStorage",
+        "typeVersion": 1,
+        "id": "googleCloudStorageUploadAudio",
+        "credentials": {
+          "googleCloudApi": {
+            "id": "gcp-newpersonalspaniolo",
+            "name": "new-personal-spaniolo (GCP)"
+          }
+        },
+        ".-x": 850,
+        ".-y": 2400,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblwnaoDiahBVJEzd",
+          "records": {
+            "data": [
+              {
+                "fields": {
+                  "fldRye1FTbNbDCigl": "={{ [ { url: $node[\"Google Cloud Storage Upload Audio\"].json.mediaLink } ] }}",
+                  "fldOyeY6aneJPtXIC": "Audio",
+                  "fldYvYiY8Cxa95ZL0": "={{ [ $node[\"Airtable Get Shot Record (AID 4)\"].json.id ] }}"
+                }
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Create File Record (Audio)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableCreateFileRecordAudio",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 1050,
+        ".-y": 2400,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblEX1h61Zxas1oaY",
+          "recordId": "={{ $node[\"Airtable Get Shot Record (AID 4)\"].json.id }}",
+          "updateFields": {
+            "fields": [
+              {
+                "fieldName": "fldahx9l0BzNjHCQL",
+                "fieldValue": "={{ [ $node[\"Airtable Create File Record (Audio)\"].json.id ] }}"
+              },
+              {
+                "fieldName": "fld7VQUut62dUqQAr",
+                "fieldValue": "={{ [] }}"
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Update Shot Record (Audio)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableUpdateShotRecordAudio",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 1250,
+        ".-y": 2400,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblEX1h61Zxas1oaY",
+          "recordId": "={{ $json.recordId }}",
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Get Shot Record (AID 14)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableGetShotRecordAid14",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 450,
+        ".-y": 2700,
+        "active": true
+      },
+      {
+        "parameters": {
+          "url": "https://api.goapi.ai/api/kling/v1/video",
+          "method": "POST",
+          "authentication": "headerAuth",
+          "headerAuth": {
+            "name": "X-API-KEY",
+            "value": "={{ $secret.GOAPI_API_KEY }}"
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "content": "={ \"negative_prompt\": \"\", \"prompt\": \"" + $node[\"Airtable Get Shot Record (AID 14)\"].json.prompt + "\", \"creativity\": 0.5, \"duration\": 5, \"aspect_ratio\": \"" + $node[\"Airtable Get Shot Record (AID 14)\"].json[\"Aspect Ratio\"][0] + "\", \"professional_mode\": false, \"image_url\": " + ($node[\"Airtable Get Shot Record (AID 14)\"].json.Image[0] && $node[\"Airtable Get Shot Record (AID 14)\"].json.Image[0].url ? "\"" + $node[\"Airtable Get Shot Record (AID 14)\"].json.Image[0].url + "\"" : "null") + ", \"camera\": { \"type\": \"zoom\", \"horizontal\": 0, \"vertical\": 0, \"zoom\": 100, \"tilt\": 0, \"pan\": 0, \"roll\": -9.76 } }",
+            "contentType": "json"
+          },
+          "responseFormat": "json",
+          "options": {
+            "fullResponse": true,
+            "alwaysContinueOnFail": true
+          }
+        },
+        "name": "HTTP Request Start Kling Video Creation (GoAPI)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 3,
+        "id": "httpRequestStartKlingVideoCreationGoapi",
+        ".-x": 650,
+        ".-y": 2700,
+        "active": true
+      },
+      {
+        "parameters": {
+          "values": [
+            {
+              "name": "status",
+              "value": "pending"
+            },
+            {
+              "name": "loopCount",
+              "value": 0
+            }
+          ]
+        },
+        "name": "Set Kling Loop Variables",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "id": "setKlingLoopVariables",
+        ".-x": 850,
+        ".-y": 2700,
+        "active": true
+      },
+      {
+        "parameters": {
+          "mode": "loopUntilCondition",
+          "iterations": 6,
+          "continueOnFail": true,
+          "conditions": [
+            {
+              "value1": "={{ $node[\"Set Kling Loop Variables\"].json.status }}",
+              "value2": "=completed",
+              "type": "string"
+            }
+          ]
+        },
+        "name": "Do While Kling Polling",
+        "type": "n8n-nodes-base.doWhile",
+        "typeVersion": 1,
+        "id": "doWhileKlingPolling",
+        ".-x": 1050,
+        ".-y": 2700,
+        "active": true
+      },
+      {
+        "parameters": {
+          "time": "120",
+          "unit": "seconds"
+        },
+        "name": "Wait for Kling Polling",
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1,
+        "id": "waitForKlingPolling",
+        ".-x": 1250,
+        ".-y": 2600,
+        "active": true
+      },
+      {
+        "parameters": {
+          "url": "https://api.goapi.ai/api/kling/v1/video/={{ $node[\"HTTP Request Start Kling Video Creation (GoAPI)\"].json.data.data.task_id }}",
+          "method": "GET",
+          "authentication": "headerAuth",
+          "headerAuth": {
+            "name": "X-API-KEY",
+            "value": "={{ $secret.GOAPI_API_KEY }}"
+          },
+          "responseFormat": "json",
+          "options": {
+            "fullResponse": true,
+            "alwaysContinueOnFail": true
+          }
+        },
+        "name": "HTTP Request Get Kling Video Status",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 3,
+        "id": "httpRequestGetKlingVideoStatus",
+        ".-x": 1450,
+        ".-y": 2600,
+        "active": true
+      },
+      {
+        "parameters": {
+          "values": [
+            {
+              "name": "loopCount",
+              "value": "={{ $node[\"Set Kling Loop Variables\"].json.loopCount + 1 }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $node[\"HTTP Request Get Kling Video Status\"].json.data.data.status }}"
+            }
+          ]
+        },
+        "name": "Update Kling Loop Variables",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "id": "updateKlingLoopVariables",
+        ".-x": 1650,
+        ".-y": 2600,
+        "active": true
+      },
+      {
+        "parameters": {
+          "conditions": [
+            {
+              "value1": "={{ $node[\"Update Kling Loop Variables\"].json.status }}",
+              "value2": "=completed",
+              "type": "string"
+            }
+          ]
+        },
+        "name": "IF Kling Completed",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "id": "ifKlingCompleted",
+        "alwaysOutputData": true,
+        "continueOnFail": true,
+        ".-x": 1850,
+        ".-y": 2700,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "create",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblwnaoDiahBVJEzd",
+          "records": {
+            "data": [
+              {
+                "fields": {
+                  "fldRye1FTbNbDCigl": "={{ [ { url: $node[\"HTTP Request Get Kling Video Status\"].json.data.data.works[0].resource.resource } ] }}",
+                  "fldOyeY6aneJPtXIC": "Video",
+                  "fldEljz4DHAw8kNEU": "={{ [ $node[\"Airtable Get Shot Record (AID 14)\"].json.id ] }}"
+                }
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Create File Record (Kling Video)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableCreateFileRecordKlingVideo",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 2050,
+        ".-y": 2600,
+        "active": true
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "baseId": "appj9o3LajZqn9Ohb",
+          "tableId": "tblEX1h61Zxas1oaY",
+          "recordId": "={{ $node[\"Airtable Get Shot Record (AID 14)\"].json.id }}",
+          "updateFields": {
+            "fields": [
+              {
+                "fieldName": "fldeZSFBTDY4QqROU",
+                "fieldValue": "={{ [ $node[\"Airtable Create File Record (Kling Video)\"].json.id ] }}"
+              },
+              {
+                "fieldName": "fldinUO0h7ngEmN5T",
+                "fieldValue": "={{ [] }}"
+              }
+            ]
+          },
+          "options": {
+            "useColumnNames": false
+          }
+        },
+        "name": "Airtable Update Shot Record (Kling Video)",
+        "type": "n8n-nodes-base.airtable",
+        "typeVersion": 1,
+        "id": "airtableUpdateShotRecordKlingVideo",
+        "credentials": {
+          "airtableApi": {
+            "id": "airtable-eccb2",
+            "name": "ECCB2 (Airtable)"
+          }
+        },
+        ".-x": 2250,
+        ".-y": 2600,
+        "active": true
+      }
+    ],
+    "connections": {
+      "webhookTrigger": {
+        "main": [
+          [
+            {
+              "node": "routeByAid18",
+              "type": "main"
+            },
+            {
+              "node": "routeByAid16",
+              "type": "main"
+            },
+            {
+              "node": "routeByAid17",
+              "type": "main"
+            },
+            {
+              "node": "routeByAid6",
+              "type": "main"
+            },
+            {
+              "node": "routeByAid2",
+              "type": "main"
+            },
+            {
+              "node": "routeByAid7",
+              "type": "main"
+            },
+            {
+              "node": "routeByAid3",
+              "type": "main"
+            },
+            {
+              "node": "routeByAid4",
+              "type": "main"
+            },
+            {
+              "node": "routeByAid14",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "routeByAid18": {
+        "main": [
+          [
+            {
+              "node": "airtableGetStoryRecordAid18",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "airtableGetStoryRecordAid18": {
+        "main": [
+          [
+            {
+              "node": "openAiCreateStoryCompletion",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "openAiCreateStoryCompletion": {
+        "main": [
+          [
+            {
+              "node": "airtableUpdateStoryRecord",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "routeByAid16": {
+        "main": [
+          [
+            {
+              "node": "airtableGetStoryRecordAid16",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "airtableGetStoryRecordAid16": {
+        "main": [
+          [
+            {
+              "node": "openAiGenerateScenes",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "openAiGenerateScenes": {
+        "main": [
+          [
+            {
+              "node": "airtableCreateSceneRecord",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "airtableCreateSceneRecord": {
+        "main": [
+          [
+            {
+              "node": "openAiGenerateShotsFromScene",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "openAiGenerateShotsFromScene": {
+        "main": [
+          [
+            {
+              "node": "openAiGenerateImagePrompt",
+              "type": "main"
+            },
+            {
+              "node": "openAiGenerateVideoPrompt",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "openAiGenerateImagePrompt": {
+        "main": [
+          [
+            {
+              "node": "airtableCreateShotRecord",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "openAiGenerateVideoPrompt": {
+        "main": [
+          [
+            {
+              "node": "airtableCreateShotRecord",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "routeByAid17": {
+        "main": [
+          [
+            {
+              "node": "airtableGetShotRecordAid17",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "airtableGetShotRecordAid17": {
+        "main": [
+          [
+            {
+              "node": "openAiGenerateDalleImage",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "openAiGenerateDalleImage": {
+        "main": [
+          [
+            {
+              "node": "airtableCreateFileRecordDalle",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "airtableCreateFileRecordDalle": {
+        "main": [
+          [
+            {
+              "node": "airtableUpdateShotRecordDalle",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "routeByAid6": {
+        "main": [
+          [
+            {
+              "node": "airtableGetShotRecordAid6",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "airtableGetShotRecordAid6": {
+        "main": [
+          [
+            {
+              "node": "httpRequestMidjourneyImageGoapi",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "httpRequestMidjourneyImageGoapi": {
+        "main": [
+          [
+            {
+              "node": "ifMidjourneySuccess",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "ifMidjourneySuccess": {
+        "main": [
+          [
+            {
+              "node": "airtableCreateFileRecordMjSuccess",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "node": "airtableCreateLogRecordMjFailure",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "routeByAid2": {
+        "main": [
+          [
+            {
+              "node": "airtableGetShotRecordAid2",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "airtableGetShotRecordAid2": {
+        "main": [
+          [
+            {
+              "node": "httpRequestUpscaleImageGoapi",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "httpRequestUpscaleImageGoapi": {
+        "main": [
+          [
+            {
+              "node": "ifUpscaleSuccess",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "ifUpscaleSuccess": {
+        "main": [
+          [
+            {
+              "node": "airtableCreateFileRecordUpscaleSuccess",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "node": "airtableCreateLogRecordUpscaleFailure",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "routeByAid7": {
+        "main": [
+          [
+            {
+              "node": "airtableGetShotRecordAid7",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "airtableGetShotRecordAid7": {
+        "main": [
+          [
+            {
+              "node": "httpRequestFluxImageGoapi",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "httpRequestFluxImageGoapi": {
+        "main": [
+          [
+            {
+              "node": "ifFluxSuccess",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "ifFluxSuccess": {
+        "main": [
+          [
+            {
+              "node": "airtableCreateFileRecordFluxSuccess",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "routeByAid3": {
+        "main": [
+          [
+            {
+              "node": "airtableGetShotRecordAid3",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "airtableGetShotRecordAid3": {
+        "main": [
+          [
+            {
+              "node": "httpRequestStartLumalabsCreationGoapi",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "httpRequestStartLumalabsCreationGoapi": {
+        "main": [
+          [
+            {
+              "node": "setLumalabsLoopVariables",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "setLumalabsLoopVariables": {
+        "main": [
+          [
+            {
+              "node": "doWhileLumalabsPolling",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "doWhileLumalabsPolling": {
+        "main": [
+          [
+            {
+              "node": "waitForLumalabsPolling",
+              "type": "main"
+            }
+          ]
+        ],
+        "continue": [
+          [
+            {
+              "node": "ifLumalabsCompleted",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "waitForLumalabsPolling": {
+        "main": [
+          [
+            {
+              "node": "httpRequestGetLumalabsVideoStatus",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "httpRequestGetLumalabsVideoStatus": {
+        "main": [
+          [
+            {
+              "node": "updateLumalabsLoopVariables",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "updateLumalabsLoopVariables": {
+        "main": [
+          [
+            {
+              "node": "doWhileLumalabsPolling",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "ifLumalabsCompleted": {
+        "main": [
+          [
+            {
+              "node": "airtableCreateFileRecordLumalabsVideo",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "airtableCreateFileRecordLumalabsVideo": {
+        "main": [
+          [
+            {
+              "node": "airtableUpdateShotRecordLumalabsVideo",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "routeByAid4": {
+        "main": [
+          [
+            {
+              "node": "airtableGetShotRecordAid4",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "airtableGetShotRecordAid4": {
+        "main": [
+          [
+            {
+              "node": "elevenLabsCreateTextToSpeech",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "elevenLabsCreateTextToSpeech": {
+        "main": [
+          [
+            {
+              "node": "googleCloudStorageUploadAudio",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "googleCloudStorageUploadAudio": {
+        "main": [
+          [
+            {
+              "node": "airtableCreateFileRecordAudio",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "airtableCreateFileRecordAudio": {
+        "main": [
+          [
+            {
+              "node": "airtableUpdateShotRecordAudio",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "routeByAid14": {
+        "main": [
+          [
+            {
+              "node": "airtableGetShotRecordAid14",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "airtableGetShotRecordAid14": {
+        "main": [
+          [
+            {
+              "node": "httpRequestStartKlingVideoCreationGoapi",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "httpRequestStartKlingVideoCreationGoapi": {
+        "main": [
+          [
+            {
+              "node": "setKlingLoopVariables",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "setKlingLoopVariables": {
+        "main": [
+          [
+            {
+              "node": "doWhileKlingPolling",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "doWhileKlingPolling": {
+        "main": [
+          [
+            {
+              "node": "waitForKlingPolling",
+              "type": "main"
+            }
+          ]
+        ],
+        "continue": [
+          [
+            {
+              "node": "ifKlingCompleted",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "waitForKlingPolling": {
+        "main": [
+          [
+            {
+              "node": "httpRequestGetKlingVideoStatus",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "httpRequestGetKlingVideoStatus": {
+        "main": [
+          [
+            {
+              "node": "updateKlingLoopVariables",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "updateKlingLoopVariables": {
+        "main": [
+          [
+            {
+              "node": "doWhileKlingPolling",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "ifKlingCompleted": {
+        "main": [
+          [
+            {
+              "node": "airtableCreateFileRecordKlingVideo",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "airtableCreateFileRecordKlingVideo": {
+        "main": [
+          [
+            {
+              "node": "airtableUpdateShotRecordKlingVideo",
+              "type": "main"
+            }
+          ]
+        ]
+      }
+    },
+    "active": false,
+    "name": "EDGLRD Content Creator B v2.0 (Converted from Make.com)",
+    "settings": {
+      "workflowParameter": [
+        {
+          "name": "GOAPI_API_KEY",
+          "value": "YOUR_GOAPI_API_KEY",
+          "type": "string"
+        },
+        {
+          "name": "MJ_CREATE_IMAGES_WEBHOOK",
+          "value": "YOUR_MJ_CREATE_IMAGES_WEBHOOK_URL",
+          "type": "string"
+        },
+        {
+          "name": "MJ_UPSCALE_IMAGE_WEBHOOK",
+          "value": "YOUR_MJ_UPSCALE_IMAGE_WEBHOOK_URL",
+          "type": "string"
+        },
+        {
+          "name": "FLUX_CREATE_IMAGE_WEBHOOK",
+          "value": "YOUR_FLUX_CREATE_IMAGE_WEBHOOK_URL",
+          "type": "string"
+        },
+        {
+          "name": "LUMALABS_API_KEY",
+          "value": "YOUR_LUMALABS_API_KEY",
+          "type": "string"
+        },
+        {
+          "name": "GCP_BUCKET",
+          "value": "YOUR_GCP_BUCKET_NAME",
+          "type": "string"
+        },
+        {
+          "name": "GCP_PROJECT_ID",
+          "value": "YOUR_GCP_PROJECT_ID",
+          "type": "string"
+        }
+      ]
+    },
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "fd572e8a-e9b4-4e2b-8a8b-f5f4b5f4f5f4"
+    }
+  }

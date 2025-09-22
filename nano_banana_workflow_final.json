@@ -1,0 +1,443 @@
+{
+  "name": "Nano Banana Scenes and Shots Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollIntervalMs": 60000,
+        "base": {
+          "__rl": true,
+          "value": "app5F3fyU5Y5ojAVx",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblA1XL6rouRveUdX",
+          "mode": "list"
+        },
+        "triggerField": "Last Modified",
+        "additionalFields": {}
+      },
+      "id": "f8e8c5d4-3a3e-4d96-b6e2-1a2b3c4d5e6f",
+      "name": "Scenes Trigger",
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 3,
+      "position": [250, 300],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "1",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "9c3b2a1d-8e7f-4d6c-5b4a-3e2f1d0c9b8a",
+              "leftValue": "={{ $json.fields.Status }}",
+              "rightValue": "Ready",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Check Scene Ready",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4-turbo",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are an expert cinematographer specializing in shot breakdowns for AI image generation.\n\n## Your Task:\nAnalyze the scene description and create a detailed shot breakdown with exactly {{ $json.fields.Shot_Count || 5 }} shots.\n\n## For each shot provide:\n- Shot number (1-5)\n- Shot type (Wide, Medium, Close-Up, OTS, Low Angle)\n- Detailed description for AI image generation\n- Camera specifications\n- Mood and lighting notes\n\n## Output Format:\nReturn a JSON array with shot objects containing:\n- shot_number\n- shot_type\n- description\n- camera_notes\n- mood\n\nEnsure consistency across all shots."
+            },
+            {
+              "role": "user",
+              "content": "Scene Name: {{ $json.fields.Scene_Name }}\nScene Description: {{ $json.fields.Scene_Prompt }}\nNumber of Shots: {{ $json.fields.Shot_Count || 5 }}\n\nCreate {{ $json.fields.Shot_Count || 5 }} cinematic shots for this scene."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.8,
+          "maxTokens": 2000,
+          "topP": 1
+        }
+      },
+      "id": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+      "name": "Generate Shot Breakdown",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [650, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "2",
+          "name": "OpenAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the GPT response and create shot records\nconst response = items[0].json.content;\nconst sceneData = $('Scenes Trigger').first().json;\n\ntry {\n  // Clean and parse JSON response\n  let cleanResponse = response.trim();\n  cleanResponse = cleanResponse.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  \n  const jsonMatch = cleanResponse.match(/\\[[\\s\\S]*\\]/);\n  let shots = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(cleanResponse);\n  \n  // Create shot records for Airtable\n  const shotRecords = shots.map((shot, index) => ({\n    Scene_Name: sceneData.fields.Scene_Name,\n    Shot_Number: shot.shot_number || (index + 1),\n    Shot_Prompt: shot.description || `Shot ${index + 1}`,\n    Status: \"Draft\",\n    Model: \"gpt-4-turbo\"\n  }));\n  \n  return shotRecords.map(record => ({ json: { fields: record } }));\n  \n} catch (error) {\n  // Fallback: create basic shots\n  const shotCount = sceneData.fields.Shot_Count || 5;\n  const shotTypes = ['Wide Shot', 'Medium Shot', 'Close-Up', 'OTS', 'Low Angle'];\n  const fallbackShots = [];\n  \n  for (let i = 0; i < shotCount; i++) {\n    fallbackShots.push({\n      json: {\n        fields: {\n          Scene_Name: sceneData.fields.Scene_Name,\n          Shot_Number: i + 1,\n          Shot_Prompt: `${shotTypes[i]} for ${sceneData.fields.Scene_Name}`,\n          Status: \"Draft\",\n          Model: \"gpt-4-turbo\"\n        }\n      }\n    });\n  }\n  \n  return fallbackShots;\n}"
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+      "name": "Process Shots",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app5F3fyU5Y5ojAVx",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblEKIW0K7rJLl6uv",
+          "mode": "list"
+        },
+        "fields": "={{ $json.fields }}",
+        "options": {}
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-456789012345",
+      "name": "Create Shot Records",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [1050, 300],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "1",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app5F3fyU5Y5ojAVx",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblA1XL6rouRveUdX",
+          "mode": "list"
+        },
+        "id": "={{ $('Scenes Trigger').first().json.id }}",
+        "fields": {
+          "Status": "Shots_Created"
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-c901-2345-efab-567890123456",
+      "name": "Update Scene Status",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [1250, 300],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "1",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollIntervalMs": 30000,
+        "base": {
+          "__rl": true,
+          "value": "app5F3fyU5Y5ojAVx",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblEKIW0K7rJLl6uv",
+          "mode": "list"
+        },
+        "triggerField": "Last Modified",
+        "additionalFields": {}
+      },
+      "id": "f6a7b8c9-0123-4567-fabc-678901234567",
+      "name": "Shots Trigger",
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 3,
+      "position": [250, 600],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "1",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "7b8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e",
+              "leftValue": "={{ $json.fields.Status }}",
+              "rightValue": "Create_Main_Composition",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a7b8c901-2345-6789-abcd-ef0123456789",
+      "name": "Check Create Main",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [450, 600]
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4-turbo",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are an expert at creating detailed prompts for AI image generation using Flux/SDXL models.\n\nCreate a comprehensive master prompt that includes:\n- Detailed visual description\n- Camera settings (aperture, focal length)\n- Lighting setup\n- Color grading\n- Composition elements\n- Style references\n\nBe descriptive yet concise (150-250 words)."
+            },
+            {
+              "role": "user",
+              "content": "Scene: {{ $json.fields.Scene_Name }}\nShot: {{ $json.fields.Shot_Number }}\nDescription: {{ $json.fields.Shot_Prompt }}\n\nCreate a master prompt for generating this shot."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 500,
+          "topP": 1
+        }
+      },
+      "id": "b8c90123-4567-890a-bcde-f12345678901",
+      "name": "Generate Master Prompt",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [650, 600],
+      "credentials": {
+        "openAiApi": {
+          "id": "2",
+          "name": "OpenAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fal.run/fal-ai/flux/dev",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prompt\": \"{{ $json.content }}\",\n  \"image_size\": \"landscape_16_9\",\n  \"num_inference_steps\": 28,\n  \"guidance_scale\": 3.5,\n  \"num_images\": 1,\n  \"enable_safety_checker\": false,\n  \"seed\": {{ Math.floor(Math.random() * 1000000) }},\n  \"sync_mode\": true\n}",
+        "options": {
+          "timeout": 120000
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth"
+      },
+      "id": "c9012345-6789-0abc-defa-234567890123",
+      "name": "Generate Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [850, 600],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "3",
+          "name": "Fal API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app5F3fyU5Y5ojAVx",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblEKIW0K7rJLl6uv",
+          "mode": "list"
+        },
+        "id": "={{ $('Shots Trigger').first().json.id }}",
+        "fields": {
+          "Status": "Completed",
+          "Master_Prompt": "={{ $('Generate Master Prompt').first().json.content }}",
+          "Main_Composition": [
+            {
+              "url": "={{ $json.images[0].url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d0123456-789a-bcde-f012-345678901234",
+      "name": "Update Shot Record",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [1050, 600],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "1",
+          "name": "Airtable API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Scenes Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Scene Ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Scene Ready": {
+      "main": [
+        [
+          {
+            "node": "Generate Shot Breakdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Shot Breakdown": {
+      "main": [
+        [
+          {
+            "node": "Process Shots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Shots": {
+      "main": [
+        [
+          {
+            "node": "Create Shot Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Shot Records": {
+      "main": [
+        [
+          {
+            "node": "Update Scene Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shots Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Create Main",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Create Main": {
+      "main": [
+        [
+          {
+            "node": "Generate Master Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Master Prompt": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image": {
+      "main": [
+        [
+          {
+            "node": "Update Shot Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "",
+    "executionTimeout": 300
+  },
+  "staticData": null,
+  "tags": ["airtable", "gpt", "flux", "image-generation"],
+  "triggerCount": 2,
+  "updatedAt": "2025-09-12T20:12:00.000Z",
+  "versionId": "1.0"
+}

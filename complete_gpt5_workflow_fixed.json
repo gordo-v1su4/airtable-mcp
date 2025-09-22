@@ -1,0 +1,643 @@
+{
+  "name": "Complete GPT-5 Scenes & Shots Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollIntervalMs": 60000,
+        "application": "app5F3fyU5Y5ojAVx",
+        "table": "tblA1XL6rouRveUdX",
+        "triggerField": "Last Modified",
+        "additionalFields": {}
+      },
+      "id": "scenes_trigger",
+      "name": "Scenes Trigger",
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 3,
+      "position": [140, 300],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_AIRTABLE_CREDENTIAL",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "scene_ready_condition",
+              "leftValue": "={{ $json.fields.Status }}",
+              "rightValue": "Ready",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if_scene_ready",
+      "name": "IF Scene Ready",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [360, 300]
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "value": "gpt-4-turbo",
+          "mode": "name"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are an expert cinematographer and shot breakdown specialist with deep knowledge of visual storytelling and professional filmmaking techniques. Your task is to analyze scene descriptions and create detailed shot breakdowns that will be used for AI image generation.\n\n## Shot Breakdown Requirements:\n\n**Create exactly {{ $node['scenes_trigger'].json.fields.Shot_Count || 8 }} shots with:**\n\n1. **Shot Progression**: Build a cohesive visual narrative from establishing to detail shots\n2. **Camera Techniques**: Use professional cinematography terminology (WS, MS, CU, ECU, OTS, etc.)\n3. **Visual Consistency**: Ensure all shots work together as a complete sequence\n4. **Technical Specifications**: Include camera angles, movements, and framing details\n5. **Emotional Arc**: Each shot should contribute to the overall mood and story\n\n**For each shot, provide:**\n- **Shot Type**: Professional designation (Wide Shot, Medium Shot, Close-Up, etc.)\n- **Camera Position**: Specific placement and angle\n- **Subject Focus**: Primary and secondary elements in frame\n- **Lighting Notes**: Key lighting considerations\n- **Mood Description**: Emotional tone and atmosphere\n- **Technical Details**: Lens choice, depth of field, movement if any\n\n**Output Format**: Return a JSON array with exactly {{ $node['scenes_trigger'].json.fields.Shot_Count || 8 }} objects:\n```json\n[\n  {\n    \"shot_number\": 1,\n    \"shot_type\": \"Wide Shot\",\n    \"description\": \"Detailed visual description for AI generation\",\n    \"camera_notes\": \"Technical camera specifications\",\n    \"mood\": \"Emotional tone\",\n    \"lighting\": \"Lighting setup description\",\n    \"focus\": \"Primary subject focus\"\n  }\n]\n```\n\nEnsure each shot is detailed enough for high-quality AI image generation while maintaining cinematic coherence throughout the sequence."
+            },
+            {
+              "role": "user",
+              "content": "**Scene Information:**\n- **Scene Name**: {{ $node['scenes_trigger'].json.fields.Scene_Name }}\n- **Scene Description**: {{ $node['scenes_trigger'].json.fields.Scene_Prompt }}\n- **Number of Shots**: {{ $node['scenes_trigger'].json.fields.Shot_Count || 8 }}\n- **Character Reference**: {{ $node['scenes_trigger'].json.fields.Character_Image ? 'Available' : 'Not provided' }}\n- **Environment Reference**: {{ $node['scenes_trigger'].json.fields.Environment_Image ? 'Available' : 'Not provided' }}\n\n**Instructions:**\nBreak down this scene into {{ $node['scenes_trigger'].json.fields.Shot_Count || 8 }} professional cinematic shots. Each shot should be optimized for AI image generation while maintaining visual storytelling coherence. Focus on creating a compelling sequence that captures the essence of the scene through varied camera techniques and perspectives.\n\nReturn the response as a valid JSON array only, with no additional text or formatting."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.8,
+          "maxTokens": 2500,
+          "topP": 1,
+          "frequencyPenalty": 0.1,
+          "presencePenalty": 0
+        },
+        "requestOptions": {
+          "timeout": 90000
+        }
+      },
+      "id": "breakdown_scene_gpt5",
+      "name": "Breakdown Scene with GPT-5",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [580, 200],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the shot breakdown from GPT-5\nconst response = $node['breakdown_scene_gpt5'].json.content;\nconst sceneData = $node['scenes_trigger'].json;\n\ntry {\n  // Clean the response and extract JSON\n  let cleanResponse = response.trim();\n  \n  // Remove markdown code blocks if present\n  cleanResponse = cleanResponse.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  \n  // Try to find JSON array in the response\n  const jsonMatch = cleanResponse.match(/\\[[\\s\\S]*\\]/);\n  let shots;\n  \n  if (jsonMatch) {\n    shots = JSON.parse(jsonMatch[0]);\n  } else {\n    // Fallback: try parsing the entire cleaned response\n    shots = JSON.parse(cleanResponse);\n  }\n\n  // Validate and ensure we have the right number of shots\n  const targetCount = sceneData.fields.Shot_Count || 8;\n  \n  // Trim or extend to match target count\n  if (shots.length > targetCount) {\n    shots = shots.slice(0, targetCount);\n  } else if (shots.length < targetCount) {\n    // Add additional shots if needed\n    while (shots.length < targetCount) {\n      const shotNum = shots.length + 1;\n      shots.push({\n        shot_number: shotNum,\n        shot_type: \"Medium Shot\",\n        description: `Additional shot ${shotNum} for ${sceneData.fields.Scene_Name}: ${sceneData.fields.Scene_Prompt}`,\n        camera_notes: \"Standard framing with professional composition\",\n        mood: \"Consistent with scene atmosphere\",\n        lighting: \"Natural lighting setup\",\n        focus: \"Scene elements\"\n      });\n    }\n  }\n\n  // Create shot records for Airtable\n  const shotRecords = shots.map((shot, index) => ({\n    json: {\n      fields: {\n        Scene_Name: sceneData.fields.Scene_Name,\n        Shot_Number: shot.shot_number || (index + 1),\n        Shot_Prompt: shot.description || `Shot ${index + 1} for ${sceneData.fields.Scene_Name}`,\n        Status: \"Draft\",\n        Model: \"gpt-4-turbo\"\n      }\n    }\n  }));\n\n  return shotRecords;\n\n} catch (error) {\n  console.error('Error parsing GPT-5 response:', error);\n  console.log('Raw response:', response);\n  \n  // Fallback: create basic shots if parsing fails\n  const targetCount = sceneData.fields.Shot_Count || 8;\n  const fallbackShots = [];\n  \n  const shotTypes = [\"Wide Shot\", \"Medium Shot\", \"Close-Up\", \"Over-the-Shoulder\", \"Low Angle\", \"High Angle\", \"Dutch Angle\", \"Extreme Close-Up\"];\n  \n  for (let i = 0; i < targetCount; i++) {\n    fallbackShots.push({\n      json: {\n        fields: {\n          Scene_Name: sceneData.fields.Scene_Name,\n          Shot_Number: i + 1,\n          Shot_Prompt: `${shotTypes[i % shotTypes.length]} for ${sceneData.fields.Scene_Name}: ${sceneData.fields.Scene_Prompt}`,\n          Status: \"Draft\",\n          Model: \"gpt-4-turbo\"\n        }\n      }\n    });\n  }\n  \n  return fallbackShots;\n}"
+      },
+      "id": "process_shot_breakdown",
+      "name": "Process Shot Breakdown",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 200]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "application": "app5F3fyU5Y5ojAVx",
+        "table": "tblEKIW0K7rJLl6uv",
+        "fields": "={{ $json.fields }}",
+        "options": {}
+      },
+      "id": "create_shot_records",
+      "name": "Create Shot Records",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [1020, 200],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_AIRTABLE_CREDENTIAL",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Count successful shot creations and prepare scene update\nconst allItems = $input.all();\nconst successCount = allItems.length;\nconst sceneData = $node['scenes_trigger'].json;\nconst targetCount = sceneData.fields.Shot_Count || 8;\n\n// Extract shot IDs for reference\nconst shotIds = allItems.map(item => item.json.id);\n\nreturn [{\n  json: {\n    scene_id: sceneData.id,\n    scene_name: sceneData.fields.Scene_Name,\n    shots_created: successCount,\n    target_shots: targetCount,\n    success_rate: (successCount / targetCount * 100).toFixed(1),\n    shot_ids: shotIds,\n    completion_timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "summarize_creation",
+      "name": "Summarize Creation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1240, 200]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "application": "app5F3fyU5Y5ojAVx",
+        "table": "tblA1XL6rouRveUdX",
+        "id": "={{ $json.scene_id }}",
+        "fields": {
+          "Status": "Shots_Created"
+        },
+        "options": {}
+      },
+      "id": "update_scene_status",
+      "name": "Update Scene Status",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [1460, 200],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_AIRTABLE_CREDENTIAL",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollIntervalMs": 30000,
+        "application": "app5F3fyU5Y5ojAVx",
+        "table": "tblEKIW0K7rJLl6uv",
+        "triggerField": "Last Modified",
+        "additionalFields": {}
+      },
+      "id": "shots_trigger",
+      "name": "Shots Trigger",
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 3,
+      "position": [140, 800],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_AIRTABLE_CREDENTIAL",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "create_main_comp_condition",
+              "leftValue": "={{ $json.fields.Status }}",
+              "rightValue": "Create_Main_Composition",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if_create_main_composition",
+      "name": "IF Create Main Composition",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [360, 700]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "create_camera_angles_condition",
+              "leftValue": "={{ $json.fields.Status }}",
+              "rightValue": "Create_Camera_Angles",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if_create_camera_angles",
+      "name": "IF Create Camera Angles",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [360, 1100]
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "value": "gpt-4-turbo",
+          "mode": "name"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are an expert image analyst specializing in Nano Banana image editing workflows. Your expertise includes advanced prompt engineering for AI image generation, technical photography specifications, and cinematic visual analysis.\n\n## Nano Banana Best Practices:\n\n### **Technical Specifications**\n- **Camera Settings**: Include specific aperture (f/1.4, f/2.8, etc.), focal length (35mm, 85mm, etc.), ISO values\n- **Lighting Setup**: Define key light, fill light, rim light positions and intensities\n- **Image Quality**: Specify resolution, clarity, sharpness, grain characteristics\n- **Color Grading**: Define color temperature, saturation, contrast preferences\n\n### **Visual Composition**\n- **Character Details**: Precise positioning, expressions, clothing, props\n- **Environmental Elements**: Atmospheric conditions, background details, textures\n- **Depth of Field**: Specify focus points, bokeh characteristics, foreground/background blur\n- **Framing**: Apply composition rules (rule of thirds, leading lines, symmetry)\n\n### **Style References**\n- **Cinematic Approach**: Reference specific film styles, directors, or visual aesthetics\n- **Artistic Style**: Photography style (portrait, documentary, commercial, etc.)\n- **Color Palette**: Dominant colors, mood-based color schemes\n- **Material Specifications**: Skin textures, fabric details, surface properties\n\n### **Output Requirements**\n- Create ONE comprehensive master prompt (not multiple variations)\n- Be highly descriptive yet concise (aim for 150-250 words)\n- Focus on elements that ensure visual consistency across multiple shots\n- Include specific technical parameters for professional-grade results\n- Prioritize elements visible in the reference images\n\n**Mission**: Analyze ALL provided reference images and scene context to create the most effective master prompt for professional AI image generation using Nano Banana."
+            },
+            {
+              "role": "user",
+              "content": "**Shot Information:**\n- **Scene**: {{ $node['shots_trigger'].json.fields.Scene_Name }}\n- **Shot #**: {{ $node['shots_trigger'].json.fields.Shot_Number }}\n- **Description**: {{ $node['shots_trigger'].json.fields.Shot_Prompt }}\n\n**Task**: Create a comprehensive master prompt for Nano Banana that captures all visual elements from the shot description and technical requirements. The prompt should be optimized for generating a high-quality main composition image that can serve as a reference for subsequent camera angle variations.\n\n**Focus on**: Technical accuracy, visual consistency, cinematic quality, and professional image generation standards. Return only the master prompt text, no additional formatting or explanations."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 800,
+          "topP": 1,
+          "frequencyPenalty": 0,
+          "presencePenalty": 0
+        },
+        "requestOptions": {
+          "timeout": 60000
+        }
+      },
+      "id": "analyze_with_gpt5",
+      "name": "Analyze with GPT-5",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [580, 600],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fal.run/fal-ai/flux/dev",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  \"prompt\": $node['analyze_with_gpt5'].json.content,\n  \"image_size\": \"landscape_16_9\",\n  \"num_inference_steps\": 28,\n  \"guidance_scale\": 3.5,\n  \"num_images\": 1,\n  \"enable_safety_checker\": false,\n  \"seed\": Math.floor(Math.random() * 1000000),\n  \"sync_mode\": true\n} }}",
+        "options": {
+          "response": {
+            "fullResponse": false,
+            "neverError": false
+          },
+          "timeout": 120000,
+          "redirect": {
+            "followRedirect": true,
+            "maxRedirect": 21
+          }
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "falApi"
+      },
+      "id": "generate_main_composition",
+      "name": "Generate Main Composition",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [800, 600],
+      "credentials": {
+        "falApi": {
+          "id": "YOUR_FAL_API_KEY",
+          "name": "Fal.ai API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "application": "app5F3fyU5Y5ojAVx",
+        "table": "tblEKIW0K7rJLl6uv",
+        "id": "={{ $node['shots_trigger'].json.id }}",
+        "fields": {
+          "Status": "Ready",
+          "Master_Prompt": "={{ $node['analyze_with_gpt5'].json.content }}",
+          "Main_Composition": [
+            {
+              "url": "={{ $node['generate_main_composition'].json.images[0].url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "update_with_main_composition",
+      "name": "Update with Main Composition",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [1020, 600],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_AIRTABLE_CREDENTIAL",
+          "name": "Airtable API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "value": "gpt-4-turbo",
+          "mode": "name"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a master cinematographer with expertise in creating comprehensive shot variations from a main composition. Your specialization includes advanced camera techniques, professional lighting setups, and maintaining visual consistency across complex shot sequences.\n\n## Required Camera Angles (Generate All 5):\n\n1. **360 Shot** - Full environmental perspective\n2. **Over-the-Shoulder (OTS)** - Perspective depth, relationship dynamics\n3. **Close-Up** - Character detail, emotional expression, intimate framing\n4. **Profile Shot** - Side angle perspective\n5. **Low Angle** - Power/dominance perspective shot from below subject\n\n## Technical Requirements for Each Angle:\n\n### **Camera Specifications**\n- **Position**: Exact camera placement and height relative to subjects\n- **Lens Choice**: Focal length appropriate for the shot type\n- **Framing**: What's included/excluded, aspect considerations\n- **Movement**: Any camera movement (pan, tilt, dolly, etc.)\n\n### **Lighting Adaptations**\n- **Key Light Adjustment**: How primary lighting changes with angle\n- **Fill Light**: Secondary lighting modifications\n- **Practical Lights**: Environmental lighting integration\n- **Shadow Play**: How shadows contribute to the shot\n\n### **Composition Elements**\n- **Focus Points**: Primary and secondary subjects in frame\n- **Depth of Field**: Foreground, mid-ground, background relationships\n- **Leading Lines**: Visual elements that guide the eye\n- **Negative Space**: Use of empty areas for visual impact\n\n### **Consistency Maintenance**\n- **Visual Continuity**: Preserve core elements from master prompt\n- **Character Consistency**: Maintain appearance, costume, expression range\n- **Environmental Coherence**: Keep lighting mood and atmospheric elements\n- **Color Palette**: Preserve the established color scheme\n\n## Output Format:\nProvide 5 detailed prompts, each numbered and optimized for Nano Banana generation. Each prompt should be self-contained and include all necessary technical and artistic specifications for professional-quality image generation.\n\n**Goal**: Create a comprehensive shot sequence that tells a complete visual story while maintaining absolute consistency with the main composition."
+            },
+            {
+              "role": "user",
+              "content": "**Main Composition Analysis:**\n- **Image**: {{ $node['shots_trigger'].json.fields.Main_Composition[0].url }}\n- **Master Prompt**: {{ $node['shots_trigger'].json.fields.Master_Prompt }}\n\n**Shot Context:**\n- **Scene**: {{ $node['shots_trigger'].json.fields.Scene_Name }}\n- **Shot #**: {{ $node['shots_trigger'].json.fields.Shot_Number }}\n- **Original Description**: {{ $node['shots_trigger'].json.fields.Shot_Prompt }}\n\n**Task**: Generate 5 distinct camera angle prompts that maintain complete visual consistency with the main composition while providing comprehensive cinematic coverage. Each prompt must be optimized for Nano Banana and include specific technical details for professional results.\n\n**Critical**: Maintain exact character appearance, lighting mood, color palette, and environmental elements across all angles. Each prompt should be detailed enough to generate professional-quality images that could be used in actual film production.\n\nReturn 5 numbered prompts (1-5), each clearly separated and optimized for AI image generation."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.8,
+          "maxTokens": 2000,
+          "topP": 1,
+          "frequencyPenalty": 0.1,
+          "presencePenalty": 0
+        },
+        "requestOptions": {
+          "timeout": 90000
+        }
+      },
+      "id": "generate_camera_prompts_gpt5",
+      "name": "Generate Camera Prompts with GPT-5",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [580, 1000],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the camera angle prompts from GPT-5\nconst response = $node['generate_camera_prompts_gpt5'].json.content;\nconst shotData = $node['shots_trigger'].json;\n\n// Define the 5 required camera angles based on Airtable fields\nconst requiredAngles = [\n  { name: 'Shot_360', label: '360 Shot' },\n  { name: 'OTS_Shot', label: 'Over-the-Shoulder (OTS)' },\n  { name: 'Close_Up', label: 'Close-Up' },\n  { name: 'Profile_Shot', label: 'Profile Shot' },\n  { name: 'Low_Angle', label: 'Low Angle' }\n];\n\ntry {\n  // Split the response by numbered sections (1., 2., etc.)\n  const sections = response.split(/\\n?\\d+\\.\\s*/)\n    .filter(section => section.trim().length > 50) // Filter out short/empty sections\n    .map(section => section.trim());\n\n  // Remove any leading text before the first numbered item\n  if (sections[0] && !sections[0].toLowerCase().includes('shot') && !sections[0].toLowerCase().includes('angle')) {\n    sections.shift();\n  }\n\n  // Create camera angle objects\n  const cameraAngles = requiredAngles.map((angle, index) => {\n    // Get the corresponding prompt section\n    let prompt = sections[index] || '';\n    \n    // If no specific prompt found, create a fallback using master prompt\n    if (!prompt || prompt.length < 50) {\n      prompt = `${shotData.fields.Master_Prompt} - ${angle.label} perspective with professional cinematography, maintaining complete visual consistency with the main composition. Technical ${angle.label.toLowerCase()} framing with appropriate depth of field and lighting adjustments.`;\n    }\n    \n    // Clean up the prompt (remove any leading angle names if duplicated)\n    prompt = prompt.replace(new RegExp(`^${angle.label}:?\\s*`, 'i'), '').trim();\n    \n    return {\n      field_name: angle.name,\n      angle_label: angle.label,\n      prompt: prompt,\n      main_composition_url: shotData.fields.Main_Composition[0].url,\n      shot_id: shotData.id,\n      master_prompt: shotData.fields.Master_Prompt,\n      scene_name: shotData.fields.Scene_Name,\n      shot_number: shotData.fields.Shot_Number,\n      angle_index: index + 1\n    };\n  });\n\n  console.log(`Successfully processed ${cameraAngles.length} camera angles`);\n  \n  // Return array of camera angles for batch processing\n  return cameraAngles.map(angle => ({ json: angle }));\n\n} catch (error) {\n  console.error('Error processing camera angles:', error);\n  console.log('Raw GPT-5 response:', response);\n  \n  // Fallback: create basic camera angles using master prompt\n  const fallbackAngles = requiredAngles.map((angle, index) => ({\n    json: {\n      field_name: angle.name,\n      angle_label: angle.label,\n      prompt: `${shotData.fields.Master_Prompt} - Professional ${angle.label} with cinematic framing, maintaining visual consistency with main composition. Technical specifications: appropriate focal length, professional lighting, and composition for ${angle.label.toLowerCase()} perspective.`,\n      main_composition_url: shotData.fields.Main_Composition[0].url,\n      shot_id: shotData.id,\n      master_prompt: shotData.fields.Master_Prompt,\n      scene_name: shotData.fields.Scene_Name,\n      shot_number: shotData.fields.Shot_Number,\n      angle_index: index + 1\n    }\n  }));\n  \n  console.log('Using fallback camera angles');\n  return fallbackAngles;\n}"
+      },
+      "id": "process_camera_angles",
+      "name": "Process Camera Angles",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 1000]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fal.run/fal-ai/flux/dev",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  \"prompt\": $json.prompt,\n  \"image_size\": \"landscape_16_9\",\n  \"num_inference_steps\": 25,\n  \"guidance_scale\": 3.5,\n  \"num_images\": 1,\n  \"enable_safety_checker\": false,\n  \"seed\": Math.floor(Math.random() * 1000000),\n  \"sync_mode\": true\n} }}",
+        "options": {
+          "response": {
+            "fullResponse": false,
+            "neverError": false
+          },
+          "timeout": 120000,
+          "redirect": {
+            "followRedirect": true,
+            "maxRedirect": 21
+          }
+        },
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "falApi"
+      },
+      "id": "generate_camera_angle_images",
+      "name": "Generate Camera Angle Images",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1020, 1000],
+      "credentials": {
+        "falApi": {
+          "id": "YOUR_FAL_API_KEY",
+          "name": "Fal.ai API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all generated camera angle images\nconst allItems = $input.all();\nconst firstItem = allItems[0].json;\nconst shotId = firstItem.shot_id;\n\n// Create update fields object with proper field names\nconst updateFields = {\n  Status: \"Completed\"\n};\n\n// Add each camera angle image to the appropriate field\nallItems.forEach(item => {\n  const fieldName = item.json.field_name;\n  const imageUrl = item.json.images[0].url;\n  \n  // Set the field with the image URL in Airtable attachment format\n  updateFields[fieldName] = [\n    {\n      url: imageUrl\n    }\n  ];\n});\n\n// Add metadata\nconst metadata = {\n  shot_id: shotId,\n  update_fields: updateFields,\n  total_angles: allItems.length,\n  generation_completed: new Date().toISOString(),\n  scene_name: firstItem.scene_name,\n  shot_number: firstItem.shot_number,\n  angle_types: allItems.map(item => item.json.angle_label),\n  success_rate: (allItems.length / 5 * 100).toFixed(1), // Expected 5 angles\n  workflow_version: \"gpt5_enhanced_v2\"\n};\n\nconsole.log(`Successfully generated ${metadata.total_angles} camera angles for ${metadata.scene_name} Shot ${metadata.shot_number}`);\n\nreturn [{ json: metadata }];"
+      },
+      "id": "collect_camera_angles",
+      "name": "Collect Camera Angles",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1240, 1000]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "application": "app5F3fyU5Y5ojAVx",
+        "table": "tblEKIW0K7rJLl6uv",
+        "id": "={{ $json.shot_id }}",
+        "fields": "={{ $json.update_fields }}",
+        "options": {}
+      },
+      "id": "update_with_camera_angles",
+      "name": "Update with Camera Angles",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [1460, 1000],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_AIRTABLE_CREDENTIAL",
+          "name": "Airtable API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "scenes_trigger": {
+      "main": [
+        [
+          {
+            "node": "if_scene_ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_scene_ready": {
+      "main": [
+        [
+          {
+            "node": "breakdown_scene_gpt5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "breakdown_scene_gpt5": {
+      "main": [
+        [
+          {
+            "node": "process_shot_breakdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "process_shot_breakdown": {
+      "main": [
+        [
+          {
+            "node": "create_shot_records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create_shot_records": {
+      "main": [
+        [
+          {
+            "node": "summarize_creation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "summarize_creation": {
+      "main": [
+        [
+          {
+            "node": "update_scene_status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "shots_trigger": {
+      "main": [
+        [
+          {
+            "node": "if_create_main_composition",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "if_create_camera_angles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_create_main_composition": {
+      "main": [
+        [
+          {
+            "node": "analyze_with_gpt5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_create_camera_angles": {
+      "main": [
+        [
+          {
+            "node": "generate_camera_prompts_gpt5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "analyze_with_gpt5": {
+      "main": [
+        [
+          {
+            "node": "generate_main_composition",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate_main_composition": {
+      "main": [
+        [
+          {
+            "node": "update_with_main_composition",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate_camera_prompts_gpt5": {
+      "main": [
+        [
+          {
+            "node": "process_camera_angles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "process_camera_angles": {
+      "main": [
+        [
+          {
+            "node": "generate_camera_angle_images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate_camera_angle_images": {
+      "main": [
+        [
+          {
+            "node": "collect_camera_angles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "collect_camera_angles": {
+      "main": [
+        [
+          {
+            "node": "update_with_camera_angles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["gpt-5", "airtable", "cinematography", "nano-banana", "fal-ai"],
+  "triggerCount": 0,
+  "updatedAt": "2025-09-12T20:12:00.000Z",
+  "versionId": "3.0"
+}
